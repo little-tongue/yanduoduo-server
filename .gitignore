@@ -10,3 +10,7 @@ run/
 .DS_Store
 *.sw*
 *.un~
+
+# secret
+
+config/secret.js

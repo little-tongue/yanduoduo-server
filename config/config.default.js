@@ -1,5 +1,7 @@
 'use strict';
 
+const secret = require('./secret');
+
 module.exports = appInfo => {
   const config = exports = {};
 
@@ -8,6 +10,15 @@ module.exports = appInfo => {
 
   // add your config here
   config.middleware = [];
+
+  config.redis = {
+    client: {
+      port: 6379,
+      host: '39.105.57.95',
+      password: secret.redisPwd,
+      db: 0, // 默认(开发环境)使用 db0
+    },
+  };
 
   return config;
 };
