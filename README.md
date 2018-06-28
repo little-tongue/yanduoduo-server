@@ -6,20 +6,61 @@
 
 ## 快速开始
 
+**注意：因为有一部分敏感配置没有上传，所以源码直接 clone 下来启动会报错，请创建自己的配置。**
+
+如下：
+
+```js
+// config/secret.js
+
+module.exports = {
+  cookieSignKey: '',
+  redisPwd: '',
+  aliYun: {
+    accessKeyId: '',
+    secretAccessKey: '',
+  },
+  mysql: {
+    username: '',
+    password: '',
+  },
+};
+```
+
 ### 本地开发
 
+1. 下载源码并安装依赖
+
 ```bash
+$ git clone https://github.com/little-tongue/yanduoduo-server.git
+$ cd yanduoduo-server
 $ npm i
-$ npm run dev
-$ open http://localhost:7001/
 ```
+2. 启动服务 
+
+```bash
+$ npm run dev
+```
+
+应用默认监听 `7001` 端口，待应用启动后，通过 `http://localhost:7001` 即可访问。
 
 ### 部署
 
+1. 下载源码并安装依赖
+
+```bash
+$ git clone https://github.com/little-tongue/yanduoduo-server.git
+$ cd yanduoduo-server
+$ npm i --production # 只安装项目依赖
+```
+
+2. 生产环境下启动
+
 ```bash
 $ npm start
-$ npm stop
 ```
+
+执行 `npm stop` 可停止服务。
 
 ### 内置指令
 
