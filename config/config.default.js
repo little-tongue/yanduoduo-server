@@ -6,7 +6,7 @@ module.exports = appInfo => {
   const config = exports = {};
 
   // use for cookie sign key, should change to your own and keep security
-  config.keys = appInfo.name + '_1529993397580_8972';
+  config.keys = appInfo.name + secret.cookieSignKey;
 
   // add your config here
   config.middleware = [];
@@ -37,8 +37,8 @@ module.exports = appInfo => {
     host: '39.105.57.95',
     port: 3306,
     database: 'yanduoduotest',
-    username: 'yanduoduo',
-    password: secret.mysqlPwd,
+    username: secret.mysql.username,
+    password: secret.mysql.password,
   };
 
   config.security = {
