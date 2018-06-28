@@ -101,7 +101,34 @@ class UserController extends Controller {
   }
 
   async resetPassword() {
-    // TODO
+    const { ctx } = this;
+    const { logger, helper } = ctx;
+
+    try {
+      ctx.validate(validateRules.registerForm);
+    } catch (err) {
+      logger.info(err.errors);
+      return this.fail(new CustomError(CustomError.TYPES.invalidParam));
+    }
+    const { phone, code, password, rePassword } = ctx.request.body;
+    if (password !== rePassword) {
+      return this.fail(new CustomError(CustomError.TYPES.invalidParam));
+    }
+
+    const user = await ctx.model.User.findByPhone(phone);
+    if (!user) {
+      return this.fail(new CustomError(CustomError.TYPES.login.unRegistered));
+    }
+    const isCodeCorrect = await ctx.service.user.checkPhoneCode(phone, code);
+    if (!isCodeCorrect) {
+      return this.fail(new CustomError(CustomError.TYPES.phoneCode.errorCode));
+    }
+    const [secret, signedPwd] = helper.secretPassword(password);
+    user.pwd_key = secret;
+    user.password = signedPwd;
+    await user.save();
+    this.success();
+    logger.info('用户 %d 修改密码', user.id);
   }
 
   async refreshToken() {

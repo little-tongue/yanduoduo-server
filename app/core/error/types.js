@@ -41,12 +41,8 @@ module.exports = {
       code: 'UnRegistered',
       message: '该用户不存在',
     },
-    newDevice: {
-      code: 107,
-      message: '新设备登陆，请验证手机号',
-    },
     passwordError: {
-      code: 108,
+      code: 'PasswordError',
       message: '密码错误',
     },
   },
