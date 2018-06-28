@@ -20,5 +20,17 @@ module.exports = appInfo => {
     },
   };
 
+  config.phoneCode = {
+    interval: 60, // 60s内不允许重复获取
+    maxAge: 60 * 15, // 验证码有效期为 15 分钟
+  };
+
+  config.sms = {
+    accessKeyId: secret.aliYun.accessKeyId,
+    secretAccessKey: secret.aliYun.secretAccessKey,
+    signName: '颜多多',
+    templateCode: 'SMS_138076461',
+  };
+
   return config;
 };
