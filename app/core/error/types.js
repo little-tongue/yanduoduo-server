@@ -46,4 +46,14 @@ module.exports = {
       message: '密码错误',
     },
   },
+  token: {
+    error: {
+      code: 'InvalidToken',
+      message: '无效的 token',
+    },
+    expired: {
+      code: 'TokenExpired',
+      message: 'token 已过期',
+    },
+  },
 };

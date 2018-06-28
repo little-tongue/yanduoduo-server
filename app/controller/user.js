@@ -132,7 +132,31 @@ class UserController extends Controller {
   }
 
   async refreshToken() {
-    // TODO
+    const { ctx } = this;
+    const { logger, helper } = ctx;
+
+    const refreshToken = ctx.query && ctx.query.token;
+    if (!refreshToken) {
+      return this.fail(new CustomError(CustomError.TYPES.token.error));
+    }
+
+    logger.info('刷新 token');
+    const user = await ctx.model.User.findOne({
+      where: {
+        token: refreshToken,
+      },
+    });
+    if (!user) {
+      return this.fail(new CustomError(CustomError.TYPES.token.error));
+    }
+    if (helper.isExpired(user.token_expires_in)) {
+      return this.fail(new CustomError(CustomError.TYPES.token.expired));
+    }
+
+    const userId = user.id;
+    const token = await ctx.service.user.generateToken(userId);
+    this.success('刷新成功', token);
+    logger.info('用户 %d 刷新 token 成功', userId);
   }
 
   async getProfile() {

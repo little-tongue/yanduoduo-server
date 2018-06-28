@@ -96,4 +96,14 @@ module.exports = {
   getExpiresIn(maxAge) {
     return Date.now() + maxAge * 1000;
   },
+
+  /**
+   * 判断是否到了过期时间
+   *
+   * @param {string} date - 过期的时间点
+   * @return {boolean} - 检查结果
+   */
+  isExpired(date) {
+    return new Date() >= new Date(date);
+  },
 };
