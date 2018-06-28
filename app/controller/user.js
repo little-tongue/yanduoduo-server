@@ -160,7 +160,10 @@ class UserController extends Controller {
   }
 
   async getProfile() {
-    // TODO
+    const { ctx } = this;
+
+    const profile = await ctx.model.User.getProfile(ctx.userId);
+    this.success('成功获取用户信息', profile);
   }
 
   async uploadAvatar() {

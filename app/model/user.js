@@ -45,5 +45,18 @@ module.exports = app => {
     });
   };
 
+  User.getProfile = async function(userId) {
+    const user = await this.findById(userId, {
+      attributes: [
+        'id',
+        'nickname',
+        'phone',
+        'avatar',
+        'birthday',
+      ],
+    });
+    return user.toJSON();
+  };
+
   return User;
 };

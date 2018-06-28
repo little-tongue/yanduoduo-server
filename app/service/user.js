@@ -153,6 +153,10 @@ class UserService extends Service {
       expires_in: accessAge,
     };
   }
+
+  getUserIdByToken(token) {
+    return this.app.redis.get(token);
+  }
 }
 
 module.exports = UserService;
