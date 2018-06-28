@@ -56,4 +56,8 @@ module.exports = {
       message: 'token 已过期',
     },
   },
+  uploadError: {
+    code: 'UPLOAD_IMAGE_FAIL',
+    message: '上传图片出错',
+  },
 };

@@ -9,6 +9,9 @@
 
 const Service = require('egg').Service;
 const CustomError = require('../core/error/CustomError');
+const Sharp = require('sharp');
+const path = require('path');
+const mkdirp = require('mkdirp');
 
 class UserService extends Service {
   /**
@@ -177,6 +180,28 @@ class UserService extends Service {
     });
 
     logger.info('清除用户 token 缓存，用户 ID：', userId);
+  }
+
+  saveAvatar(buffer, userId) {
+    const { app, ctx } = this;
+    const { helper } = ctx;
+    const { avatarWidth, imageDir } = app.config.upload;
+
+    mkdirp.sync(imageDir); // 如果图片目录不存在，则创建
+    const fileName = `u_${userId}_${helper.randomString(8)}.jpeg`;
+    const filePath = path.join(imageDir, fileName);
+
+    return Sharp(buffer).
+      resize(avatarWidth, avatarWidth).
+      ignoreAspectRatio().
+      jpeg({
+        chromaSubsampling: '4:4:4',
+      }).
+      toFile(filePath).
+      then(info => {
+        info.fileName = fileName;
+        return info;
+      });
   }
 }
 

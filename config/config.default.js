@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const secret = require('./secret');
 
 module.exports = appInfo => {
@@ -50,6 +51,11 @@ module.exports = appInfo => {
   config.token = {
     accessAge: 60 * 60 * 2,
     refreshAge: 60 * 60 * 24 * 30,
+  };
+
+  config.upload = {
+    imageDir: path.resolve(__dirname, '../app/public/uploads/avatar'),
+    avatarWidth: 650,
   };
 
   return config;

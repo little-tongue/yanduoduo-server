@@ -12,5 +12,7 @@ run/
 *.un~
 
 # secret
-
 config/secret.js
+
+# upload
+app/public/uploads/*
