@@ -47,5 +47,10 @@ module.exports = appInfo => {
     },
   };
 
+  config.token = {
+    accessAge: 60 * 60 * 2,
+    refreshAge: 60 * 60 * 24 * 30,
+  };
+
   return config;
 };

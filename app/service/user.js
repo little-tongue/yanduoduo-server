@@ -95,6 +95,64 @@ class UserService extends Service {
       pwd_key: secret,
     });
   }
+
+  /**
+   * 检查密码是否正确
+   *
+   * @param {object} user - 用户 Model 实例
+   * @param {string} password - 密码
+   * @return {boolean} 正确返回 true，错误返回 false
+   */
+  checkPassword(user, password) {
+    return this.ctx.helper.sign(password, user.pwd_key) === user.password;
+  }
+
+  async generateToken(userId) {
+    const { ctx, app } = this;
+    const { helper, logger } = ctx;
+    const { redis, config } = app;
+
+    logger.info('生成token，userId: %d', userId);
+
+    const accessToken = helper.uuid();
+    const refreshToken = helper.uuid();
+
+    // 获取之前未过期的 access_token
+    const userTokenKey = 'token_' + userId;
+    const oldToken = await redis.get(userTokenKey);
+
+    const pipeline = redis.pipeline();
+    const { accessAge, refreshAge } = config.token;
+    if (oldToken) {
+      pipeline.del(oldToken); // 删除未过期的 access_token
+    }
+    pipeline.set(accessToken, userId);
+    pipeline.set(userTokenKey, accessToken);
+    pipeline.expire(accessToken, accessAge);
+    pipeline.expire(userTokenKey, accessAge);
+    try {
+      await pipeline.exec();
+    } catch (e) {
+      logger.error(e);
+      throw new CustomError(CustomError.TYPES.serverError);
+    }
+
+    await ctx.model.User.update({
+      token: refreshToken,
+      token_expires_in: helper.getExpiresIn(refreshAge),
+    }, {
+      where: {
+        id: userId,
+      },
+    });
+
+    logger.info('成功生成 token');
+    return {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      expires_in: accessAge,
+    };
+  }
 }
 
 module.exports = UserService;

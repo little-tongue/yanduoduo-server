@@ -10,7 +10,7 @@
 module.exports = app => {
   app.beforeStart(async () => {
     app.logger.info('开始同步模型到数据库');
-    await app.model.sync();
+    await app.model.sync({ alter: true });
     app.logger.info('数据库模型同步结束');
   });
 };

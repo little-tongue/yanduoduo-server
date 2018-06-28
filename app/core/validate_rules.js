@@ -20,4 +20,15 @@ module.exports = {
     password: 'password',
     rePassword: 'password',
   },
+  loginForm: {
+    phone,
+    code: {
+      type: 'string',
+      required: false,
+    },
+    password: {
+      type: 'string',
+      required: false,
+    },
+  },
 };

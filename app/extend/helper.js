@@ -8,6 +8,7 @@
 'use strict';
 
 const crypto = require('crypto');
+const uuidv4 = require('uuid/v4');
 
 module.exports = {
   /**
@@ -75,5 +76,24 @@ module.exports = {
     const secret = this.randomString(8);
     const signedPwd = this.sign(password, secret);
     return [secret, signedPwd];
+  },
+
+  /**
+   * 获取 uuid
+   *
+   * @return {String} - 唯一 id
+   */
+  uuid() {
+    return uuidv4();
+  },
+
+  /**
+   * 根据有效时间获取过期时间点
+   *
+   * @param {number} [maxAge] - 有效时间，单位是秒
+   * @return {number} - 过期时间点的 Unix 时间戳
+   */
+  getExpiresIn(maxAge) {
+    return Date.now() + maxAge * 1000;
   },
 };

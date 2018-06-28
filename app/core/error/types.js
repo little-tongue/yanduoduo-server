@@ -12,6 +12,10 @@ module.exports = {
     code: 'InvalidParam',
     message: '参数不合法',
   },
+  serverError: {
+    code: 'ServerError',
+    message: '服务器错误',
+  },
   phoneCode: {
     tooOften: {
       code: 'GetPhoneCodeTooOfter',
@@ -30,6 +34,20 @@ module.exports = {
     registered: {
       code: 'PhoneRegistered',
       message: '该手机号已注册',
+    },
+  },
+  login: {
+    unRegistered: {
+      code: 'UnRegistered',
+      message: '该用户不存在',
+    },
+    newDevice: {
+      code: 107,
+      message: '新设备登陆，请验证手机号',
+    },
+    passwordError: {
+      code: 108,
+      message: '密码错误',
     },
   },
 };

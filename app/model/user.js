@@ -30,6 +30,8 @@ module.exports = app => {
       type: STRING,
       allowNull: false,
     },
+    token: STRING,
+    token_expires_in: DATE,
     nickname: STRING(30),
     birthday: DATE,
     avatar: STRING,

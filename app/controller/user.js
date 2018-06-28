@@ -61,7 +61,43 @@ class UserController extends Controller {
   }
 
   async login() {
-    // TODO
+    const { ctx } = this;
+    const { logger } = ctx;
+
+    try {
+      ctx.validate(validateRules.loginForm);
+    } catch (err) {
+      this.fail(new CustomError(CustomError.TYPES.invalidParam));
+      logger.warn(err.errors);
+      return;
+    }
+
+    const { phone, code, password } = ctx.request.body;
+    const user = await ctx.model.User.findByPhone(phone);
+    if (!user) {
+      return this.fail(new CustomError(CustomError.TYPES.login.unRegistered));
+    }
+    const userId = user.id;
+    const userService = ctx.service.user;
+    if (password) {
+      // 用户名密码登陆
+      const isPwdCorrect = userService.checkPassword(user, password);
+      if (!isPwdCorrect) {
+        return this.fail(
+          new CustomError(CustomError.TYPES.login.passwordError));
+      }
+    } else if (code) {
+      // 手机短信登录
+      const isCodeCorrect = await ctx.service.user.checkPhoneCode(phone, code);
+      if (!isCodeCorrect) {
+        return this.fail(
+          new CustomError(CustomError.TYPES.phoneCode.errorCode));
+      }
+    }
+
+    const token = await userService.generateToken(userId);
+    this.success('登陆成功', token);
+    logger.info('用户 %d 登陆成功', userId);
   }
 
   async resetPassword() {
