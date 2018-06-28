@@ -14,4 +14,10 @@ const phone = {
 
 module.exports = {
   phone,
+  registerForm: {
+    phone,
+    code: 'string',
+    password: 'password',
+    rePassword: 'password',
+  },
 };

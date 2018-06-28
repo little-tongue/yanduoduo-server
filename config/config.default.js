@@ -32,5 +32,20 @@ module.exports = appInfo => {
     templateCode: 'SMS_138076461',
   };
 
+  config.sequelize = {
+    dialect: 'mysql',
+    host: '39.105.57.95',
+    port: 3306,
+    database: 'yanduoduotest',
+    username: 'yanduoduo',
+    password: secret.mysqlPwd,
+  };
+
+  config.security = {
+    csrf: {
+      enable: false,
+    },
+  };
+
   return config;
 };

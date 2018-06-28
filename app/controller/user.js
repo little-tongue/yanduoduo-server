@@ -29,7 +29,35 @@ class UserController extends Controller {
   }
 
   async register() {
-    // TODO
+    const { ctx } = this;
+    const { logger } = ctx;
+
+    try {
+      ctx.validate(validateRules.registerForm);
+    } catch (err) {
+      logger.info(err.errors);
+      return this.fail(new CustomError(CustomError.TYPES.invalidParam));
+    }
+    const { phone, code, password, rePassword } = ctx.request.body;
+    if (password !== rePassword) {
+      return this.fail(new CustomError(CustomError.TYPES.invalidParam));
+    }
+    const userService = ctx.service.user;
+    const isCodeCorrect = await userService.checkPhoneCode(phone, code);
+    if (!isCodeCorrect) {
+      return this.fail(new CustomError(CustomError.TYPES.phoneCode.errorCode));
+    }
+    let user = await ctx.model.User.findByPhone(phone);
+    if (user) {
+      return this.fail(new CustomError(CustomError.TYPES.register.registered));
+    }
+    // 新建用户
+    user = await userService.createUser(phone, password);
+    this.success('创建用户成功', {
+      id: user.id,
+      nickname: user.nickname,
+    });
+    logger.info('用户 %s 创建成功，id 为 %d', user.nickname, user.id);
   }
 
   async login() {

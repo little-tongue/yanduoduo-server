@@ -59,6 +59,42 @@ class UserService extends Service {
       throw new CustomError(CustomError.TYPES.phoneCode.fail);
     }
   }
+
+  /**
+   * 检查手机验证码是否正确
+   *
+   * @param {string} phoneNum - 手机号
+   * @param {string} code - 验证码
+   * @return {Promise<boolean>} 检查结果
+   */
+  async checkPhoneCode(phoneNum, code) {
+    const { app } = this;
+    const { redis } = app;
+
+    const key = phoneNum + '_code';
+    const cacheCode = await redis.hget(key, 'code');
+    if (cacheCode === code) {
+      await redis.del(key);
+      return true;
+    }
+    return false;
+  }
+
+  async createUser(phone, password) {
+    const { ctx } = this;
+    const { helper, logger } = ctx;
+
+    const nickname = helper.randomString(8);
+    const [secret, signedPwd] = helper.secretPassword(password);
+
+    logger.info('开始向数据库写入新用户信息');
+    return await ctx.model.User.create({
+      nickname,
+      phone,
+      password: signedPwd,
+      pwd_key: secret,
+    });
+  }
 }
 
 module.exports = UserService;

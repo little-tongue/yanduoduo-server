@@ -11,4 +11,7 @@ module.exports = {
   redis: {
     db: 1, // 生产环境下使用 db1
   },
+  sequelize: {
+    database: 'yanduoduo',
+  },
 };

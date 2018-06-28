@@ -21,5 +21,15 @@ module.exports = {
       code: 'SendCodeFail',
       message: '发送短信验证码失败',
     },
+    errorCode: {
+      code: 'PhoneCodeError',
+      message: '验证码不正确',
+    },
+  },
+  register: {
+    registered: {
+      code: 'PhoneRegistered',
+      message: '该手机号已注册',
+    },
   },
 };
