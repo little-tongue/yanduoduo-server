@@ -10,3 +10,9 @@ run/
 .DS_Store
 *.sw*
 *.un~
+
+# secret
+config/secret.js
+
+# upload
+app/public/uploads/*
