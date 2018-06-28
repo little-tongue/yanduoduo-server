@@ -157,6 +157,27 @@ class UserService extends Service {
   getUserIdByToken(token) {
     return this.app.redis.get(token);
   }
+
+  async clearToken(userId) {
+    const { ctx, app } = this;
+    const { logger } = ctx;
+    const { redis } = app;
+
+    const token = ctx.get('authorization');
+    await redis.del('token_' + userId);
+    await redis.del(token);
+
+    await ctx.model.User.update({
+      token: null,
+      token_expires_in: null,
+    }, {
+      where: {
+        id: userId,
+      },
+    });
+
+    logger.info('清除用户 token 缓存，用户 ID：', userId);
+  }
 }
 
 module.exports = UserService;

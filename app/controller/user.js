@@ -171,7 +171,12 @@ class UserController extends Controller {
   }
 
   async exitLogin() {
-    // TODO
+    const { ctx } = this;
+    const { userId, logger } = ctx;
+    await ctx.service.user.clearToken(userId);
+    this.success('退出登录成功');
+
+    logger.info('用户 %s 退出登录', userId);
   }
 }
 
