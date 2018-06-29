@@ -1,6 +1,6 @@
 'use strict';
 
-const BASE_URL = '/api/v1';
+const BASE_URL = '/v1';
 
 /**
  * @param {Egg.Application} app - egg application
