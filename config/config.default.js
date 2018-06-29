@@ -58,5 +58,10 @@ module.exports = appInfo => {
     avatarWidth: 650,
   };
 
+  config.alinode = {
+    appid: secret.alinode.appid,
+    secret: secret.alinode.secret,
+  };
+
   return config;
 };

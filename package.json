@@ -6,6 +6,7 @@
   "dependencies": {
     "@alicloud/sms-sdk": "^1.1.1",
     "egg": "^2.2.1",
+    "egg-alinode": "^2.0.1",
     "egg-redis": "^2.0.0",
     "egg-scripts": "^2.5.0",
     "egg-sequelize": "^3.1.4",
