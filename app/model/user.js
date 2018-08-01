@@ -17,6 +17,11 @@ module.exports = app => {
       allowNull: false,
       autoIncrement: true,
     },
+    name: {
+      type: STRING,
+      unique: true,
+      allowNull: false,
+    },
     phone: {
       type: STRING,
       unique: true,
@@ -24,16 +29,15 @@ module.exports = app => {
     },
     password: {
       type: STRING,
-      allowNull: false,
     },
     pwd_key: {
       type: STRING,
-      allowNull: false,
     },
-    token: STRING,
-    token_expires_in: DATE,
-    nickname: STRING(30),
     birthday: DATE,
+    sex: INTEGER(1),
+    city: INTEGER,
+    school: INTEGER,
+    profile: STRING,
     avatar: STRING,
   });
 

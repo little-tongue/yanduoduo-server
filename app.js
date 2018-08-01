@@ -10,7 +10,19 @@
 module.exports = app => {
   app.beforeStart(async () => {
     app.logger.info('开始同步模型到数据库');
-    await app.model.sync({ alter: true });
+    const { User, FaceScore, Photo, RefreshToken } = app.model;
+
+    User.hasOne(FaceScore);
+    User.hasOne(RefreshToken);
+    User.hasMany(Photo);
+
+    // 用户关注信息表，following：关注者，followed：被关注者，
+    User.belongsToMany(User, { as: 'follower', through: 'follows', foreignKey: 'following', otherKey: 'followed' });
+
+    // 点赞关系表，liking：点赞者，liked：被点赞者
+    User.belongsToMany(User, { as: 'liker', through: 'likes', foreignKey: 'liking', otherKey: 'liked' });
+
+    await app.model.sync();
     app.logger.info('数据库模型同步结束');
   });
 };
