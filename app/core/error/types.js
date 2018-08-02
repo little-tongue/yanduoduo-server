@@ -37,6 +37,10 @@ module.exports = {
     },
   },
   login: {
+    unRegistered: {
+      code: 'UnRegistered',
+      message: '手机号未注册',
+    },
     passwordError: {
       code: 'PasswordError',
       message: '用户名或密码错误',

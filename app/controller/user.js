@@ -70,9 +70,10 @@ class UserController extends Controller {
       }
     }
 
-    const token = await userService.generateToken(user);
+    const userId = user.id;
+    const token = await userService.generateToken(userId);
     this.success('登陆成功', token);
-    logger.info('用户 %d 登陆成功', user.id);
+    logger.info('用户 %d 登陆成功', userId);
   }
 
   async resetPassword() {
@@ -80,16 +81,13 @@ class UserController extends Controller {
     const { logger, helper } = ctx;
 
     try {
-      ctx.validate(validateRules.registerForm);
+      ctx.validate(validateRules.resetPwdForm);
     } catch (err) {
       logger.info(err.errors);
       return this.fail(new CustomError(CustomError.TYPES.invalidParam));
     }
-    const { phone, code, password, rePassword } = ctx.request.body;
-    if (password !== rePassword) {
-      return this.fail(new CustomError(CustomError.TYPES.invalidParam));
-    }
 
+    const { phone, code, password } = ctx.request.body;
     const user = await ctx.model.User.findByPhone(phone);
     if (!user) {
       return this.fail(new CustomError(CustomError.TYPES.login.unRegistered));
@@ -116,19 +114,19 @@ class UserController extends Controller {
     }
 
     logger.info('刷新 token');
-    const user = await ctx.model.User.findOne({
+    const tokenRecord = await ctx.model.RefreshToken.findOne({
       where: {
         token: refreshToken,
       },
     });
-    if (!user) {
+    if (!tokenRecord) {
       return this.fail(new CustomError(CustomError.TYPES.token.error));
     }
-    if (helper.isExpired(user.token_expires_in)) {
+    if (helper.isExpired(tokenRecord.token_expires_in)) {
       return this.fail(new CustomError(CustomError.TYPES.token.expired));
     }
 
-    const userId = user.id;
+    const userId = tokenRecord.user_id;
     const token = await ctx.service.user.generateToken(userId);
     this.success('刷新成功', token);
     logger.info('用户 %d 刷新 token 成功', userId);

@@ -25,4 +25,9 @@ module.exports = {
       required: false,
     },
   },
+  resetPwdForm: {
+    phone,
+    code: 'string',
+    password: 'password',
+  },
 };

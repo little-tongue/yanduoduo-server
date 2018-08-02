@@ -116,14 +116,13 @@ class UserService extends Service {
   /**
    * 生成用户登录后的 token
    *
-   * @param {object} user - 用户模型实例
+   * @param {number} userId - 用户 id
    * @return {Promise<{}>} - 返回 Promise 对象，包含 token 信息
    */
-  async generateToken(user) {
+  async generateToken(userId) {
     const { ctx, app } = this;
     const { helper, logger } = ctx;
     const { redis, config } = app;
-    const userId = user.id;
 
     logger.info('生成token，userId: %d', userId);
 
@@ -176,12 +175,9 @@ class UserService extends Service {
     await redis.del('token_' + userId);
     await redis.del(token);
 
-    await ctx.model.User.update({
-      token: null,
-      token_expires_in: null,
-    }, {
+    await ctx.model.RefreshToken.destroy({
       where: {
-        id: userId,
+        user_id: userId,
       },
     });
 
