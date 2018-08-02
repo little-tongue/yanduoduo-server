@@ -9,6 +9,10 @@
 
 const crypto = require('crypto');
 const uuidv4 = require('uuid/v4');
+const shortid = require('shortid');
+
+// 用户名前缀
+const USER_NAME_PREFIX = 'YDD_';
 
 module.exports = {
   /**
@@ -105,5 +109,14 @@ module.exports = {
    */
   isExpired(date) {
     return new Date() >= new Date(date);
+  },
+
+  /**
+   * 随机生成用户名，用户名具有唯一性
+   *
+   * @return {string} - 用户名
+   */
+  generateUserName() {
+    return USER_NAME_PREFIX + shortid.generate();
   },
 };

@@ -30,42 +30,9 @@ class UserController extends Controller {
     }
   }
 
-  async register() {
-    const { ctx } = this;
-    const { logger } = ctx;
-
-    try {
-      ctx.validate(validateRules.registerForm);
-    } catch (err) {
-      logger.info(err.errors);
-      return this.fail(new CustomError(CustomError.TYPES.invalidParam));
-    }
-    const { phone, code, password, rePassword } = ctx.request.body;
-    if (password !== rePassword) {
-      return this.fail(new CustomError(CustomError.TYPES.invalidParam));
-    }
-    const userService = ctx.service.user;
-    const isCodeCorrect = await userService.checkPhoneCode(phone, code);
-    if (!isCodeCorrect) {
-      return this.fail(new CustomError(CustomError.TYPES.phoneCode.errorCode));
-    }
-    let user = await ctx.model.User.findByPhone(phone);
-    if (user) {
-      return this.fail(new CustomError(CustomError.TYPES.register.registered));
-    }
-    // 新建用户
-    user = await userService.createUser(phone, password);
-    this.success('创建用户成功', {
-      id: user.id,
-      nickname: user.nickname,
-    });
-    logger.info('用户 %s 创建成功，id 为 %d', user.nickname, user.id);
-  }
-
   async login() {
     const { ctx } = this;
     const { logger } = ctx;
-
     try {
       ctx.validate(validateRules.loginForm);
     } catch (err) {
@@ -73,33 +40,39 @@ class UserController extends Controller {
       logger.warn(err.errors);
       return;
     }
-
     const { phone, code, password } = ctx.request.body;
-    const user = await ctx.model.User.findByPhone(phone);
-    if (!user) {
-      return this.fail(new CustomError(CustomError.TYPES.login.unRegistered));
+    if (!code && !password) {
+      return this.fail(new CustomError(CustomError.TYPES.invalidParam));
     }
-    const userId = user.id;
+
     const userService = ctx.service.user;
-    if (password) {
-      // 用户名密码登陆
-      const isPwdCorrect = userService.checkPassword(user, password);
-      if (!isPwdCorrect) {
-        return this.fail(
-          new CustomError(CustomError.TYPES.login.passwordError));
-      }
-    } else if (code) {
-      // 手机短信登录
+    let user = await ctx.model.User.findByPhone(phone);
+    if (code) {
+      // 手机短信登录，检查验证码是否正确，不正确直接返回错误
       const isCodeCorrect = await ctx.service.user.checkPhoneCode(phone, code);
       if (!isCodeCorrect) {
-        return this.fail(
-          new CustomError(CustomError.TYPES.phoneCode.errorCode));
+        return this.fail(new CustomError(CustomError.TYPES.phoneCode.errorCode));
+      }
+      if (!user) {
+        // 用户不存在则新建用户
+        user = await userService.createUser(phone);
+      }
+    } else if (password) {
+      // 密码登录
+      if (!user) {
+        // 用户不存在，返回错误
+        return this.fail(new CustomError(CustomError.TYPES.login.passwordError));
+      }
+      const isPwdCorrect = userService.checkPassword(user, password);
+      if (!isPwdCorrect) {
+        // 用户存在，但密码错误，返回错误
+        return this.fail(new CustomError(CustomError.TYPES.login.passwordError));
       }
     }
 
-    const token = await userService.generateToken(userId);
+    const token = await userService.generateToken(user);
     this.success('登陆成功', token);
-    logger.info('用户 %d 登陆成功', userId);
+    logger.info('用户 %d 登陆成功', user.id);
   }
 
   async resetPassword() {

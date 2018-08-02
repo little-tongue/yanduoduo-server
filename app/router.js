@@ -11,7 +11,6 @@ module.exports = app => {
   const auth = app.middleware.auth;
 
   router.get(BASE_URL + '/smsCode', userController.getPhoneCode); // 获取短信验证码
-  router.post(BASE_URL + '/register', userController.register); // 注册
   router.post(BASE_URL + '/login', userController.login); // 登陆
   router.post(BASE_URL + '/resetPassword', userController.resetPassword); // 重置密码
   router.get(BASE_URL + '/refreshToken', userController.refreshToken); // 刷新 token

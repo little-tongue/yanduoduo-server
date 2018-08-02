@@ -10,11 +10,11 @@
 module.exports = app => {
   app.beforeStart(async () => {
     app.logger.info('开始同步模型到数据库');
-    const { User, FaceScore, Photo, RefreshToken } = app.model;
+    const { User, RefreshToken, FaceScore, Photo } = app.model;
 
-    User.hasOne(FaceScore);
-    User.hasOne(RefreshToken);
-    User.hasMany(Photo);
+    User.hasOne(RefreshToken, { onDelete: 'CASCADE' });
+    User.hasOne(FaceScore, { onDelete: 'CASCADE' });
+    User.hasMany(Photo, { onDelete: 'CASCADE' });
 
     // 用户关注信息表，following：关注者，followed：被关注者，
     User.belongsToMany(User, { as: 'follower', through: 'follows', foreignKey: 'following', otherKey: 'followed' });

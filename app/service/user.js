@@ -83,20 +83,23 @@ class UserService extends Service {
     return false;
   }
 
-  async createUser(phone, password) {
+  /**
+   * 新建用户
+   *
+   * @param {string} phone - 用户手机号
+   * @return {Promise<object>} - object 为用户模型实例
+   */
+  async createUser(phone) {
     const { ctx } = this;
     const { helper, logger } = ctx;
 
-    const nickname = helper.randomString(8);
-    const [secret, signedPwd] = helper.secretPassword(password);
-
-    logger.info('开始向数据库写入新用户信息');
-    return await ctx.model.User.create({
-      nickname,
+    const name = helper.generateUserName();
+    const user = await ctx.model.User.create({
+      name,
       phone,
-      password: signedPwd,
-      pwd_key: secret,
     });
+    logger.info(`成功创建新用户，id：${user.id} name:${user.name}`);
+    return user;
   }
 
   /**
@@ -110,10 +113,17 @@ class UserService extends Service {
     return this.ctx.helper.sign(password, user.pwd_key) === user.password;
   }
 
-  async generateToken(userId) {
+  /**
+   * 生成用户登录后的 token
+   *
+   * @param {object} user - 用户模型实例
+   * @return {Promise<{}>} - 返回 Promise 对象，包含 token 信息
+   */
+  async generateToken(user) {
     const { ctx, app } = this;
     const { helper, logger } = ctx;
     const { redis, config } = app;
+    const userId = user.id;
 
     logger.info('生成token，userId: %d', userId);
 
@@ -140,13 +150,9 @@ class UserService extends Service {
       throw new CustomError(CustomError.TYPES.serverError);
     }
 
-    await ctx.model.User.update({
+    await ctx.model.RefreshToken.setToken(userId, {
       token: refreshToken,
       token_expires_in: helper.getExpiresIn(refreshAge),
-    }, {
-      where: {
-        id: userId,
-      },
     });
 
     logger.info('成功生成 token');
@@ -191,14 +197,14 @@ class UserService extends Service {
     const fileName = `u_${userId}_${helper.randomString(8)}.jpeg`;
     const filePath = path.join(imageDir, fileName);
 
-    return Sharp(buffer).
-      resize(avatarWidth, avatarWidth).
-      ignoreAspectRatio().
-      jpeg({
+    return Sharp(buffer)
+      .resize(avatarWidth, avatarWidth)
+      .ignoreAspectRatio()
+      .jpeg({
         chromaSubsampling: '4:4:4',
-      }).
-      toFile(filePath).
-      then(info => {
+      })
+      .toFile(filePath)
+      .then(info => {
         info.fileName = fileName;
         return info;
       });
