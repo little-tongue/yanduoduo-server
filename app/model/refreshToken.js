@@ -10,7 +10,7 @@
 module.exports = app => {
   const { STRING, INTEGER, DATE } = app.Sequelize;
 
-  return app.model.define('refreshToken', {
+  const RefreshToken = app.model.define('refreshToken', {
     id: {
       type: INTEGER,
       primaryKey: true,
@@ -19,5 +19,28 @@ module.exports = app => {
     },
     token: STRING,
     token_expires_in: DATE,
+  }, {
+    tableName: 'refresh_tokens',
+    createdAt: false,
+    updatedAt: false,
   });
+
+  RefreshToken.setToken = function(userId, data) {
+    return this.findOrCreate({
+      where: {
+        user_id: userId,
+      },
+      defaults: {
+        user_id: userId,
+      },
+    })
+      .spread(record => {
+        for (const key in data) {
+          record[key] = data[key];
+        }
+        return record.save();
+      });
+  };
+
+  return RefreshToken;
 };

@@ -53,10 +53,14 @@ module.exports = app => {
     const user = await this.findById(userId, {
       attributes: [
         'id',
-        'nickname',
+        'name',
         'phone',
-        'avatar',
         'birthday',
+        'sex',
+        'city',
+        'school',
+        'profile',
+        'avatar',
       ],
     });
     return user.toJSON();

@@ -39,11 +39,11 @@ module.exports = {
   login: {
     unRegistered: {
       code: 'UnRegistered',
-      message: '该用户不存在',
+      message: '手机号未注册',
     },
     passwordError: {
       code: 'PasswordError',
-      message: '密码错误',
+      message: '用户名或密码错误',
     },
   },
   token: {

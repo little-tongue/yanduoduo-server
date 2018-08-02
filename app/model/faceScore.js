@@ -20,5 +20,9 @@ module.exports = app => {
     score: {
       type: FLOAT(3, 1),
     },
+  }, {
+    tableName: 'face_scores',
+    createdAt: false,
+    updatedAt: false,
   });
 };

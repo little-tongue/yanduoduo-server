@@ -14,12 +14,6 @@ const phone = {
 
 module.exports = {
   phone,
-  registerForm: {
-    phone,
-    code: 'string',
-    password: 'password',
-    rePassword: 'password',
-  },
   loginForm: {
     phone,
     code: {
@@ -30,5 +24,10 @@ module.exports = {
       type: 'string',
       required: false,
     },
+  },
+  resetPwdForm: {
+    phone,
+    code: 'string',
+    password: 'password',
   },
 };
