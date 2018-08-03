@@ -49,7 +49,7 @@ module.exports = app => {
     });
   };
 
-  User.getProfile = async function(userId) {
+  User.getUserInfo = async function(userId) {
     const user = await this.findById(userId, {
       attributes: [
         'id',

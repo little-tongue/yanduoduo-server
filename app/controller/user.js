@@ -7,27 +7,11 @@ const toArray = require('stream-to-array');
 const sendToWormhole = require('stream-wormhole');
 
 class UserController extends Controller {
-  async getPhoneCode() {
+  async getUserInfo() {
     const { ctx } = this;
-    const { logger } = ctx;
 
-    try {
-      ctx.validate({
-        phone: validateRules.phone,
-      }, ctx.query);
-    } catch (err) {
-      logger.info(err.errors);
-      return this.fail(new CustomError(CustomError.TYPES.invalidParam));
-    }
-
-    try {
-      await ctx.service.user.sendPhoneCode(ctx.query.phone);
-      this.success();
-      logger.info('成功发送验证码');
-    } catch (err) {
-      logger.warn(err);
-      this.fail(err);
-    }
+    const profile = await ctx.model.User.getUserInfo(ctx.userId);
+    this.success('成功获取用户信息', profile);
   }
 
   async resetPassword() {
@@ -56,13 +40,6 @@ class UserController extends Controller {
     await user.save();
     this.success();
     logger.info('用户 %d 修改密码', user.id);
-  }
-
-  async getProfile() {
-    const { ctx } = this;
-
-    const profile = await ctx.model.User.getProfile(ctx.userId);
-    this.success('成功获取用户信息', profile);
   }
 
   async uploadAvatar() {
