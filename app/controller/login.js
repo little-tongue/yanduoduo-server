@@ -58,6 +58,40 @@ class LoginController extends Controller {
     logger.info('用户 %d 登陆成功', userId);
   }
 
+  async loginByThirdParty() {
+    const { ctx } = this;
+    const { logger } = ctx;
+    try {
+      ctx.validate(validateRules.thirdLogin);
+    } catch (err) {
+      this.fail(new CustomError(CustomError.TYPES.invalidParam));
+      logger.warn(err.errors);
+      return;
+    }
+
+    const loginService = ctx.service.login;
+    const { access_token, openid, type } = ctx.request.body;
+    const info = await loginService.getThirdPartyUserInfo(access_token, openid, type);
+    if (!info) {
+      this.fail(new CustomError(CustomError.TYPES.login.thirdPartyLoginFail));
+      return;
+    }
+
+    // 第三方登录校验成功
+    const bindInfo = await ctx.model.OpenId.getBoundInfo(type, openid);
+    if (bindInfo && bindInfo.user_id) {
+      // 已经绑定了用户，认为登录成功
+      const userId = bindInfo.user_id;
+      const token = await loginService.generateToken(userId);
+      this.success('登陆成功', token);
+      logger.info('用户 %d 登陆成功，登录方式：%s', userId, type);
+    } else {
+      // 尚未绑定用户
+      this.fail(new CustomError(CustomError.TYPES.login.unBound));
+      logger.info('第三方登录失败，尚未绑定。type: ' + type);
+    }
+  }
+
   async refreshToken() {
     const { ctx } = this;
     const { logger, helper } = ctx;

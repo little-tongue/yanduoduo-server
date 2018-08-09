@@ -30,4 +30,12 @@ module.exports = {
     code: 'string',
     password: 'password',
   },
+  thirdLogin: {
+    openid: 'string',
+    access_token: 'string',
+    type: {
+      type: 'enum',
+      values: ['wechat', 'qq', 'weibo'],
+    },
+  },
 };

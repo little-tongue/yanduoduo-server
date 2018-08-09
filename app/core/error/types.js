@@ -45,6 +45,14 @@ module.exports = {
       code: 'PasswordError',
       message: '用户名或密码错误',
     },
+    thirdPartyLoginFail: {
+      code: 'thirdPartyLoginFail',
+      message: '第三方登录校验失败',
+    },
+    unBound: {
+      code: 'unBound',
+      message: '尚未绑定用户',
+    },
   },
   token: {
     error: {

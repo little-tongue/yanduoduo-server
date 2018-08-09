@@ -93,6 +93,73 @@ class LoginService extends Service {
 
     logger.info('清除用户 token 缓存，用户 ID：', userId);
   }
+
+  /**
+   * 获取第三方平台用户信息
+   *
+   * @param {string} token - 调用凭证
+   * @param {string} openid - 普通用户标识
+   * @param {string} type - 平台类型：wechat、qq、weibo
+   * @return {Promise<object>} - 微信用户信息
+   */
+  async getThirdPartyUserInfo(token, openid, type) {
+    const { ctx } = this;
+    const { logger } = ctx;
+
+    let userInfo = null;
+    let url;
+    let data;
+    if (type === 'wechat') {
+      url = 'https://api.weixin.qq.com/sns/userinfo';
+      data = {
+        access_token: token,
+        openid,
+      };
+    } else if (type === 'qq') {
+      url = 'http://openapi.tencentyun.com/v3/user/get_info';
+      data = {};
+    } else if (type === 'weibo') {
+      url = 'https://api.weibo.com/2/users/show.json';
+      data = { access_token: token };
+    }
+
+    const res = await ctx.curl(url, {
+      data,
+      dataType: 'json', // 响应数据类型
+    });
+    const body = res.data;
+    if (!body || body.errcode || body.ret || body.error_code) {
+      logger.error('获取第三方平台用户信息失败, 响应数据: ' + JSON.stringify(body));
+    } else {
+      // 提取出需要的用户信息
+      if (type === 'wechat') {
+        userInfo = {
+          openid: body.openid,
+          nickname: body.nickname,
+          avatar: body.headimgurl,
+        };
+      } else if (type === 'qq') {
+        userInfo = {
+          openid,
+          nickname: body.nickname,
+          avatar: body.figureurl,
+        };
+      } else if (type === 'weibo') {
+        userInfo = {
+          openid: body.idstr,
+          nickname: body.screen_name,
+          avatar: body.profile_image_url,
+        };
+      }
+    }
+
+    // 判断获取的 openid 和客户端调用接口传过来的 openid 是否相同
+    if (userInfo && userInfo.openid !== openid) {
+      userInfo = null;
+      logger.error('第三方登录校验失败，openid 不合法');
+    }
+    return userInfo;
+  }
 }
 
 module.exports = LoginService;

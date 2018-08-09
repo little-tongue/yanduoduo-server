@@ -13,6 +13,7 @@ module.exports = app => {
   router.get(BASE_URL + '/smsCode', common.getPhoneCode); // 获取短信验证码
 
   router.post(BASE_URL + '/login', login.login); // 登陆
+  router.post(BASE_URL + '/login/third_party', login.loginByThirdParty); // 第三方登陆
   router.get(BASE_URL + '/refreshToken', login.refreshToken); // 刷新 token
   router.get(BASE_URL + '/logout', auth, login.exitLogin); // 退出登录
 
