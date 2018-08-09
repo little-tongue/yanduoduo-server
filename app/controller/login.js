@@ -12,29 +12,6 @@ const validateRules = require('../core/validate_rules');
 const CustomError = require('../core/error/CustomError');
 
 class LoginController extends Controller {
-  async getPhoneCode() {
-    const { ctx } = this;
-    const { logger } = ctx;
-
-    try {
-      ctx.validate({
-        phone: validateRules.phone,
-      }, ctx.query);
-    } catch (err) {
-      logger.info(err.errors);
-      return this.fail(new CustomError(CustomError.TYPES.invalidParam));
-    }
-
-    try {
-      await ctx.service.user.sendPhoneCode(ctx.query.phone);
-      this.success();
-      logger.info('成功发送验证码');
-    } catch (err) {
-      logger.warn(err);
-      this.fail(err);
-    }
-  }
-
   async login() {
     const { ctx } = this;
     const { logger } = ctx;
@@ -50,17 +27,17 @@ class LoginController extends Controller {
       return this.fail(new CustomError(CustomError.TYPES.invalidParam));
     }
 
-    const userService = ctx.service.user;
+    const loginService = ctx.service.login;
     let user = await ctx.model.User.findByPhone(phone);
     if (code) {
       // 手机短信登录，检查验证码是否正确，不正确直接返回错误
-      const isCodeCorrect = await ctx.service.user.checkPhoneCode(phone, code);
+      const isCodeCorrect = await ctx.service.common.checkPhoneCode(phone, code);
       if (!isCodeCorrect) {
         return this.fail(new CustomError(CustomError.TYPES.phoneCode.errorCode));
       }
       if (!user) {
         // 用户不存在则新建用户
-        user = await userService.createUser(phone);
+        user = await ctx.service.user.createUser(phone);
       }
     } else if (password) {
       // 密码登录
@@ -68,7 +45,7 @@ class LoginController extends Controller {
         // 用户不存在，返回错误
         return this.fail(new CustomError(CustomError.TYPES.login.passwordError));
       }
-      const isPwdCorrect = userService.checkPassword(user, password);
+      const isPwdCorrect = loginService.checkPassword(user, password);
       if (!isPwdCorrect) {
         // 用户存在，但密码错误，返回错误
         return this.fail(new CustomError(CustomError.TYPES.login.passwordError));
@@ -76,7 +53,7 @@ class LoginController extends Controller {
     }
 
     const userId = user.id;
-    const token = await userService.generateToken(userId);
+    const token = await loginService.generateToken(userId);
     this.success('登陆成功', token);
     logger.info('用户 %d 登陆成功', userId);
   }
@@ -104,7 +81,7 @@ class LoginController extends Controller {
     }
 
     const userId = tokenRecord.user_id;
-    const token = await ctx.service.user.generateToken(userId);
+    const token = await ctx.service.login.generateToken(userId);
     this.success('刷新成功', token);
     logger.info('用户 %d 刷新 token 成功', userId);
   }
@@ -112,7 +89,7 @@ class LoginController extends Controller {
   async exitLogin() {
     const { ctx } = this;
     const { userId, logger } = ctx;
-    await ctx.service.user.clearToken(userId);
+    await ctx.service.login.clearToken(userId);
     this.success('退出登录成功');
 
     logger.info('用户 %s 退出登录', userId);

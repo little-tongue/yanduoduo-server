@@ -119,4 +119,18 @@ module.exports = {
   generateUserName() {
     return USER_NAME_PREFIX + shortid.generate();
   },
+
+  /**
+   * 产生随机验证码
+   *
+   * @param {number} [len] - 验证码长度，默认为 6 位
+   * @return {string} - 验证码
+   */
+  generateCode(len = 6) {
+    let code = '';
+    for (let i = 0; i < len; i++) {
+      code += Math.floor(Math.random() * 10);
+    }
+    return code;
+  },
 };

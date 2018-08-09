@@ -14,7 +14,7 @@ module.exports = async (ctx, next) => {
     || ctx.request.body && ctx.request.body.access_token
     || ctx.query && ctx.query.access_token;
 
-  const userId = await ctx.service.user.getUserIdByToken(token);
+  const userId = await ctx.service.login.getUserIdByToken(token);
   if (userId) {
     ctx.userId = parseInt(userId); // redis 中读取到的是字符串，这里转换成整型
     await next();

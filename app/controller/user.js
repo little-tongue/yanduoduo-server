@@ -30,7 +30,7 @@ class UserController extends Controller {
     if (!user) {
       return this.fail(new CustomError(CustomError.TYPES.login.unRegistered));
     }
-    const isCodeCorrect = await ctx.service.user.checkPhoneCode(phone, code);
+    const isCodeCorrect = await ctx.service.common.checkPhoneCode(phone, code);
     if (!isCodeCorrect) {
       return this.fail(new CustomError(CustomError.TYPES.phoneCode.errorCode));
     }
